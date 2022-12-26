@@ -4,12 +4,30 @@ import { login, getUserInfo } from '@/api/manager.js'
 const store = createStore({
   state() {
     return {
-      user: {}
+      user: {},
+      // 菜单栏展开/收纳
+      asideWidth: '250px',
+      // 菜单
+      menus: [],
+      // 角色名称
+      ruleNames: []
     }
   },
   mutations: {
     SET_USERINFO(state, user) {
       state.user = user
+    },
+    // 修改菜单栏展开宽度
+    handleAsideWidth(state) {
+      state.asideWidth = state.asideWidth == '250px' ? '64px' : '250px'
+    },
+    // 获取菜单数据
+    SET_MENUS(state, menus) {
+      state.menus = menus
+    },
+    // 获取角色数据
+    SET_RULE_NAMES(state, ruleNames) {
+      state.ruleNames = ruleNames
     }
   },
   actions: {
@@ -31,6 +49,8 @@ const store = createStore({
         getUserInfo()
           .then(res => {
             commit('SET_USERINFO', res)
+            commit('SET_MENUS', res.menus)
+            commit('SET_RULE_NAMES', res.ruleNames)
             resolve(res)
           })
           .catch(err => {

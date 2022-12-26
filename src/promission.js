@@ -18,6 +18,8 @@ router.beforeEach((to, from, next) => {
   if (token) {
     store.dispatch('getUserInfo')
   }
+  const title = to.meta.title
+  document.title = title + '-商城管理'
   next()
 })
 

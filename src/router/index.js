@@ -5,7 +5,7 @@ const routes = [
   {
     path: '/',
     name: '/',
-    component: () => import('@/views/index.vue'),
+    component: () => import('@/layout/Admin.vue'),
     meta: {
       title: '后台首页'
     }
