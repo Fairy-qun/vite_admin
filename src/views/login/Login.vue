@@ -39,12 +39,12 @@ const formRules = reactive({
 const formRef = ref(null)
 const loading = ref(false)
 const onSubmit = () => {
-  loading.value = true
   if (!formRef) return
   formRef.value.validate(valid => {
     if (!valid) {
       return false
     }
+    loading.value = true
     store
       .dispatch('login', form)
       .then(res => {

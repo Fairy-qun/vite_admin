@@ -12,6 +12,7 @@
     "@element-plus/icons-vue": "^2.0.10",
     "axios": "^1.2.0-alpha.1",
     "element-plus": "^2.2.27",
+    "gsap": "^3.11.4",
     "install": "^0.13.0",
     "nprogress": "^0.2.0",
     "sass": "^1.57.1",
