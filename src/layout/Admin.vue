@@ -7,7 +7,7 @@
       </el-header>
       <el-container>
         <!-- 侧边栏 -->
-        <el-aside>
+        <el-aside :style="{ width: $store.state.asideWidth }">
           <aside-vue></aside-vue>
         </el-aside>
         <!-- 主体 -->
@@ -15,7 +15,7 @@
           <!-- 菜单导航 -->
           <!-- 页面主体 -->
           <tab-list></tab-list>
-          <div>
+          <div class="main-box" :style="{ left: $store.state.asideWidth }">
             <router-view></router-view>
           </div>
         </el-main>
@@ -39,8 +39,5 @@ import TabList from '@/layout/components/TabList.vue'
   top: 110px;
   right: 0;
   margin-left: 10px;
-}
-.el-header {
-  padding: 0;
 }
 </style>

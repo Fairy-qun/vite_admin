@@ -1,8 +1,8 @@
-import router from '@/router/index.js'
+import { router, addRoutes } from '@/router/index.js'
 import { Notice, showFullLoding, hideFullLoding } from '@/utils.js'
 import store from '@/store/index.js'
 // 前置守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // to and from are both route objects. must call `next`.
   showFullLoding()
   const token = sessionStorage.getItem('admin-token')
@@ -15,12 +15,15 @@ router.beforeEach((to, from, next) => {
     next({ path: from.path ? from.path : '/login' })
     Notice('请勿重复登录', 'warning')
   }
+  // 如果用户登录了，则自动将用户信息存储到vuex中
+  let hasNewRoutes = false
   if (token) {
-    store.dispatch('getUserInfo')
+    const { menus } = await store.dispatch('getUserInfo')
+    hasNewRoutes = addRoutes(menus)
   }
   const title = to.meta.title
   document.title = title + '-商城管理'
-  next()
+  hasNewRoutes ? next(to.fullPath) : next()
 })
 
 // 后置守卫

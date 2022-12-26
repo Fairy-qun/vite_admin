@@ -1,7 +1,7 @@
 <template>
-  <div>后台</div>
+  <div>分类管理</div>
 </template>
 
-<script setup></script>
+<script setup lang="ts"></script>
 
 <style lang="scss" scoped></style>

@@ -1,4 +1,6 @@
 import axios from 'axios'
+import store from '@/store/index.js'
+import { router } from '@/router/index.js'
 import { Notice } from '@/utils.js'
 const service = axios.create({
   baseURL: '/api'
@@ -29,7 +31,7 @@ service.interceptors.response.use(
     Notice(msg, 'error')
     if (msg === '非法token，请先登录！') {
       store.dispatch('logout').finally(() => location.reload())
-      router.push('/')
+      router.push('/login')
     }
     // return Promise.reject(error)
     return new Promise((resolve, reject) => {

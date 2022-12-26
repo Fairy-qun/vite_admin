@@ -1,5 +1,5 @@
 <template>
-  <div>后台</div>
+  <div>商品列表页面</div>
 </template>
 
 <script setup></script>

@@ -31,18 +31,17 @@ const store = createStore({
     }
   },
   actions: {
-    // 登录
+    // 登录接口
     login({ commit }, { username, password }) {
-      return new Promise((reslove, reject) => {
+      return new Promise((resolve, reject) => {
         login(username, password)
           .then(res => {
             sessionStorage.setItem('admin-token', res.token)
-            reslove(res)
+            resolve(res)
           })
           .catch(err => reject(err))
       })
     },
-
     // 获取当前登录用户
     getUserInfo({ commit }) {
       return new Promise((resolve, reject) => {
@@ -63,7 +62,7 @@ const store = createStore({
     logout({ commit }) {
       // 清除token
       sessionStorage.removeItem('admin-token')
-      // 移除用户信息
+      // 清除用户信息
       commit('SET_USERINFO', {})
     }
   }
