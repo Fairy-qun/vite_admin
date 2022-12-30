@@ -42,6 +42,7 @@ const { activeTab, tabLists, changeTab, removeTab, handleEvent } = useTabList()
   align-items: center;
   height: 40px;
   background-color: rgba(204, 204, 204, 0.251);
+  z-index: 1000;
   .dropdown {
     margin: 0 20px;
     width: 32px;
