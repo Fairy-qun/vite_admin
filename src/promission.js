@@ -2,6 +2,8 @@ import { router, addRoutes } from '@/router/index.js'
 import { Notice, showFullLoding, hideFullLoding } from '@/utils.js'
 import store from '@/store/index.js'
 // 前置守卫
+
+let hasGetInfo = false
 router.beforeEach(async (to, from, next) => {
   // to and from are both route objects. must call `next`.
   showFullLoding()
@@ -19,6 +21,7 @@ router.beforeEach(async (to, from, next) => {
   let hasNewRoutes = false
   if (token) {
     const { menus } = await store.dispatch('getUserInfo')
+    hasGetInfo = true
     hasNewRoutes = addRoutes(menus)
   }
   const title = to.meta.title

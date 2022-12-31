@@ -26,7 +26,7 @@ import IndexChart from '@/components/IndexChart.vue'
 import IndexShops from '@/components/IndexShops.vue'
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .container {
   background-color: rgba(204, 204, 204, 0.364);
 }

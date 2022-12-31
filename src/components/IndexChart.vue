@@ -5,7 +5,7 @@
         <div class="main">
           <div>订单统计</div>
           <div>
-            <el-check-tag style="margin-right: 10px" v-for="(item, index) in options" key="index" :checked="activeTag == item.value" @click="handleChoose(item.value)">{{ item.title }}</el-check-tag>
+            <el-check-tag style="margin-right: 10px" v-for="(item, index) in options" key="index" :checked="current == item.value" @click="handleChoose(item.value)">{{ item.text }}</el-check-tag>
           </div>
         </div>
       </template>
@@ -20,42 +20,41 @@ import { statistics3 } from '@/api/index.js'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts'
 import { useResizeObserver } from '@vueuse/core'
-const activeTag = ref('week')
+
+const current = ref('week')
 const options = [
   {
-    title: '近1个月',
+    text: '近1个月',
     value: 'month'
   },
   {
-    title: '近1周',
+    text: '近1周',
     value: 'week'
   },
   {
-    title: '近24小时',
+    text: '近24小时',
     value: 'hour'
   }
 ]
-const handleChoose = value => {
-  activeTag.value = value
-  getDataList()
+
+const handleChoose = type => {
+  current.value = type
+  getData()
 }
 
 var myChart = null
 onMounted(() => {
-  const chartDom = document.querySelector('#chart')
-  if (chartDom) {
-    myChart = echarts.init(chartDom)
-    getDataList()
-  }
+  var chartDom = document.getElementById('chart')
+  myChart = echarts.init(chartDom)
+
+  getData()
 })
 
-// 销毁容器时，总要销毁图表实例，避免出现白屏现象
 onBeforeUnmount(() => {
-  if (myChart) echarts.dispose()
+  if (myChart) echarts.dispose(myChart)
 })
 
-// 获取数据
-const getDataList = () => {
+function getData() {
   let option = {
     xAxis: {
       type: 'category',
@@ -75,12 +74,13 @@ const getDataList = () => {
       }
     ]
   }
+
   myChart.showLoading()
-  statistics3(activeTag.value)
+  statistics3(current.value)
     .then(res => {
-      const { x, y } = res
       option.xAxis.data = res.x
       option.series[0].data = res.y
+
       myChart.setOption(option)
     })
     .finally(() => {
@@ -89,9 +89,7 @@ const getDataList = () => {
 }
 
 const el = ref(null)
-useResizeObserver(el, entries => {
-  myChart.resize(entries)
-})
+useResizeObserver(el, entries => myChart.resize())
 </script>
 
 <style lang="scss" scoped>
