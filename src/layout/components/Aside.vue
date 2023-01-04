@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 const router = useRouter()
@@ -38,6 +38,10 @@ const asideMenu = computed(() => store.state.menus)
 
 // 绑定激活的index
 const defaultActive = ref(route.path)
+// 监听路由
+onBeforeRouteUpdate((to, from) => {
+  defaultActive.value = to.path
+})
 
 // 是否折叠
 const isCollapse = computed(() => !(store.state.asideWidth == '250px'))

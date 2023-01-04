@@ -7,3 +7,13 @@ export function getImageClassList(page) {
 export function addImageClass(data) {
   return axios.post('/admin/image_class', data)
 }
+
+// 修改图库分类
+export function updateImageClass(id, data) {
+  return axios.post('/admin/image_class/' + id, data)
+}
+
+// 删除图库分类
+export function removeImageClass(id) {
+  return axios.post('admin/image_class/' + id + '/delete')
+}

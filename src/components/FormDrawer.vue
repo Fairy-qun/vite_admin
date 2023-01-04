@@ -1,44 +1,38 @@
 <template>
- <div>
-  <el-drawer
-    v-model="drawer"
-    :title="title"
-    :close-on-click-modal="false"
-    :size="size"
-    :destroy-on-close="destroyOnClose"
-  >
-  <div class="formDrawer">
-    <div class="content">
-      <slot></slot>
-    </div>
-    <div class="action">
-      <el-button type="primary" @click="submit" :loading="loading">{{ confirmText }}</el-button>
-      <el-button type="info" @click="cancelResetForm">取消</el-button>
-    </div>
+  <div>
+    <el-drawer v-model="drawer" :title="title" :close-on-click-modal="false" :size="size" :destroy-on-close="destroyOnClose">
+      <div class="formDrawer">
+        <div class="content">
+          <slot></slot>
+        </div>
+        <div class="action">
+          <el-button type="primary" @click="submit" :loading="loading">{{ confirmText }}</el-button>
+          <el-button type="info" @click="cancel">取消</el-button>
+        </div>
+      </div>
+    </el-drawer>
   </div>
-  </el-drawer>
- </div>
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import { ref } from 'vue'
 const drawer = ref(false)
 const loading = ref(false)
 
 // 抽屉的开启与关闭两个方法
-const open = () => drawer.value = true
-const close = () => drawer.value = false
+const open = () => (drawer.value = true)
+const close = () => (drawer.value = false)
 
 // 显示与关闭loading效果
-const showLoading = () => loading.value = true
-const closeLoading = () => loading.value = false
+const showLoading = () => (loading.value = true)
+const closeLoading = () => (loading.value = false)
 
 // 分享属性
 const props = defineProps({
   title: String,
   size: {
     type: String,
-    default: "45%"
+    default: '45%'
   },
   destroyOnClose: {
     type: Boolean,
@@ -46,7 +40,7 @@ const props = defineProps({
   },
   confirmText: {
     type: String,
-    default: "提交"
+    default: '提交'
   },
   loading: {
     type: Boolean,
@@ -54,11 +48,10 @@ const props = defineProps({
   }
 })
 
-
 // 提交
-const emit = defineEmits(["submit","cancelResetForm"]) 
-const submit = () => emit("submit")
-const cancelResetForm = () => emit("cancelResetForm")
+const emit = defineEmits(['submit', 'cancel'])
+const submit = () => emit('submit')
+const cancel = () => emit('cancel')
 
 // 向父组件暴露以下方法
 defineExpose({
@@ -69,7 +62,7 @@ defineExpose({
 })
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .formDrawer {
   position: relative;
   display: flex;
