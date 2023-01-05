@@ -22,7 +22,7 @@
 
   <!-- 抽屉 -->
   <FormDrawer :title="title" ref="DrawerRef" @submit="handleSubmit">
-    <el-form :model="form" ref="formRef" label-width="80px" :inline="false" size="normal">
+    <el-form :model="form" ref="formRef" label-width="80px">
       <el-form-item label="角色名称" prop="name">
         <el-input v-model="form.name" placeholder="角色名称"></el-input>
       </el-form-item>
