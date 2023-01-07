@@ -1,4 +1,5 @@
 import axios from '@/axios.js'
+import { queryParams } from '@/utils.js'
 // 登录接口
 export function login(username, password) {
   return axios.post('/admin/login', {
@@ -24,14 +25,7 @@ export function updatePassword(data) {
 
 // 获取管理员列表
 export function getManagerList(page = 1, query = {}) {
-  let q = []
-  for (const key in query) {
-    if (query[key]) {
-      q.push(`${key}=${encodeURIComponent(query[key])}`)
-    }
-  }
-  let r = q.join('&')
-  r = r ? '?' + r : ''
+  let r = queryParmas(query)
   return axios.get(`/admin/manager/${page}${r}`)
 }
 
@@ -48,7 +42,7 @@ export function removeManager(id) {
 }
 // 修改管理员
 export function updateManager(id, data) {
-  return axios.post(`manager/${id}`, data)
+  return axios.post(`/admin/manager/${id}`, data)
 }
 // 增加管理员
 export function createManager(data) {
