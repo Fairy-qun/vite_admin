@@ -1,167 +1,93 @@
 <template>
-  <el-card shadow="never">
-    <el-button type="primary" size="small" @click="handleOpen">新增</el-button>
-    <el-button type="danger" size="small" @click="handleDeleteAll">批量删除</el-button>
+  <el-card shadow="never" class="border-0">
+    <!-- 新增|刷新 -->
+    <ListHeader layout="create,delete,refresh" @create="handleCreate" @refresh="getData" @delete="handleMultiDelete" />
 
-    <!-- 表格 -->
-    <el-table :data="list" border stripe style="margin-top: 10px" @selection-change="handleChenck">
+    <el-table ref="multipleTableRef" @selection-change="handleSelectionChange" :data="tableData" stripe style="width: 100%" v-loading="loading">
       <el-table-column type="selection" width="55" />
-      <el-table-column label="规格名称" prop="name"></el-table-column>
-      <el-table-column label="规格值" prop="default"></el-table-column>
-      <el-table-column label="排序" prop="order"></el-table-column>
-      <el-table-column label="状态">
+      <el-table-column prop="name" label="规格名称" />
+      <el-table-column prop="default" label="规格值" width="380" />
+      <el-table-column prop="order" label="排序" />
+      <el-table-column label="状态" width="120">
         <template #default="{ row }">
-          <el-switch v-model="row.status" :active-value="1" :inactive-value="0" @change="updateStatus(row)"></el-switch>
+          <el-switch :modelValue="row.status" :active-value="1" :inactive-value="0" :loading="row.statusLoading" :disabled="row.super == 1" @change="handleStatusChange($event, row)"> </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
-        <template #default="{ row }">
-          <el-button type="primary" size="small" text @click="handleUpdate(row)">修改</el-button>
-          <el-button type="primary" size="small" text @click="handleDelete(row)">删除</el-button>
+      <el-table-column label="操作" width="250" align="center">
+        <template #default="scope">
+          <el-button type="primary" size="small" text @click="handleEdit(scope.row)">修改</el-button>
+
+          <el-popconfirm title="是否要删除该规格？" confirmButtonText="确认" cancelButtonText="取消" @confirm="handleDelete(scope.row.id)">
+            <template #reference>
+              <el-button text type="primary" size="small">删除</el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
+
+    <div class="flex items-center justify-center mt-5">
+      <el-pagination background layout="prev, pager ,next" :total="total" :current-page="currentPage" :page-size="limit" @current-change="getData" />
+    </div>
+
+    <FormDrawer destroyOnClose ref="formDrawerRef" :title="drawerTitle" @submit="handleSubmit">
+      <el-form :model="form" ref="formRef" :rules="rules" label-width="80px" :inline="false">
+        <el-form-item label="规格名称" prop="name">
+          <el-input v-model="form.name" placeholder="规格名称"></el-input>
+        </el-form-item>
+        <el-form-item label="排序" prop="order">
+          <el-input-number v-model="form.order" :min="0" :max="1000"> </el-input-number>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-switch v-model="form.status" :active-value="1" :inactive-value="0"> </el-switch>
+        </el-form-item>
+        <el-form-item label="规格值" prop="default">
+          <TagInput v-model="form.default" />
+        </el-form-item>
+      </el-form>
+    </FormDrawer>
   </el-card>
-  <!-- 分页 -->
-  <el-pagination background layout="prev, pager ,next" :total="total" :current-page="current_page" :page-size="limit" @current-change="handleChange" style="padding: 10px" />
-
-  <!-- 抽屉 -->
-  <FormDrawer :title="title" ref="DrwerRef" @submit="handleSubmit" @cancel="cancel">
-    <el-form :model="form" ref="formRef" label-width="80px">
-      <el-form-item label="规格名称">
-        <el-input v-model="form.name" placeholder="规格名称"></el-input>
-      </el-form-item>
-      <el-form-item label="规格值">
-        <el-input v-model="form.default" placeholder="规格值"></el-input>
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-switch v-model="form.status" :active-value="1" :inactive-value="0"> </el-switch>
-      </el-form-item>
-      <el-form-item label="排序">
-        <el-input-number v-model="form.order" :min="0" :max="10000" />
-      </el-form-item>
-    </el-form>
-  </FormDrawer>
 </template>
-
 <script setup>
-import { getSkusList, createSkus, updateSkus, updateSkusStatus, deleteSkus_all } from '@/api/skus.js'
-import FormDrawer from '../../components/FormDrawer.vue'
-import { Message, Confirm } from '@/utils.js'
-import { onMounted, ref, reactive } from 'vue'
+import { ref } from 'vue'
+import ListHeader from '@/components/ListHeader.vue'
+import FormDrawer from '@/components/FormDrawer.vue'
+import TagInput from '@/components/TagInput.vue'
+import { getSkusList, createSkus, updateSkus, deleteSkus, updateSkusStatus } from '@/api/skus'
 
-const list = ref([])
-const total = ref(0)
-const current_page = ref(1)
-const limit = ref(10)
-const title = ref(null)
-// 获取数据
-const getData = () => {
-  getSkusList(current_page.value).then(res => {
-    console.log(res)
-    list.value = res.list
-    total.value = res.totalCount
-  })
-}
+import { useInitTable, useInitForm } from '@/hooks/useCommon.js'
 
-onMounted(() => {
-  getData()
+const { tableData, loading, currentPage, total, limit, getData, handleDelete, handleStatusChange, handleSelectionChange, multipleTableRef, handleMultiDelete } = useInitTable({
+  getList: getSkusList,
+  delete: deleteSkus,
+  updateStatus: updateSkusStatus
 })
-// 分页
-const handleChange = p => {
-  current_page.value = p
-  getData()
-}
 
-// 增加
-const form = reactive({
-  name: '',
-  default: '',
-  status: 1,
-  order: 50
+const { formDrawerRef, formRef, form, rules, drawerTitle, handleSubmit, handleCreate, handleEdit } = useInitForm({
+  form: {
+    name: '',
+    status: 1,
+    default: '',
+    order: 50
+  },
+  rules: {
+    name: [
+      {
+        required: true,
+        message: '规格名称不能为空',
+        trigger: 'blur'
+      }
+    ],
+    default: [
+      {
+        required: true,
+        message: '规格值不能为空',
+        trigger: 'blur'
+      }
+    ]
+  },
+  getData,
+  update: updateSkus,
+  create: createSkus
 })
-const DrwerRef = ref(null)
-const handleOpen = () => {
-  title.value = '增加'
-  DrwerRef.value.open()
-}
-const addSkus = () => {
-  createSkus(form)
-    .then(res => {
-      Message('增加成功')
-      getData()
-    })
-    .finally(() => {
-      DrwerRef.value.close()
-    })
-}
-
-// 修改
-const skusid = ref(0)
-const handleUpdate = row => {
-  title.value = '修改'
-  DrwerRef.value.open()
-  skusid.value = row.id
-  form.name = row.name
-  form.default = row.default
-  form.status = row.status
-  form.order = row.order
-}
-const updateData = () => {
-  updateSkus(skusid.value, form)
-    .then(res => {
-      Message('修改成功')
-      getData()
-    })
-    .finally(() => {
-      DrwerRef.value.close()
-    })
-}
-// 处理程序
-const handleSubmit = () => {
-  if (title.value === '增加') {
-    addSkus()
-  }
-  if (title.value === '修改') {
-    updateData()
-  }
-}
-
-// 修改状态
-const updateStatus = row => {
-  // console.log(row.id)
-  updateSkusStatus(row.id, row.status).then(res => {
-    Message('修改状态成功')
-    getData()
-  })
-}
-
-// 删除
-const ids = ref([])
-const handleChenck = data => {
-  // console.log(data)
-  ids.value = data.map(o => o.id)
-}
-
-const handleDeleteAll = () => {
-  Confirm('确认删除所选规格?')
-    .then(res => {
-      deleteSkus_all(ids.value).then(res => {
-        Message('删除成功')
-        getData()
-      })
-    })
-    .catch(() => {
-      Message('取消删除', 'info')
-    })
-}
-const handleDelete = row => {
-  ids.value.push(row.id)
-  handleDeleteAll()
-}
-const cancel = () => {
-  DrwerRef.value.close()
-}
 </script>
-
-<style lang="scss" scoped></style>
